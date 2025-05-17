@@ -104,43 +104,35 @@ def parse_torrent_details(api_response: Dict[str, Any]) -> Optional[TorrentDetai
         raise TPBContentError(f"Error parsing torrent details fields: {e}. Data: {api_response}") from e
 
 
-def parse_file_list(api_response: List[Dict[str, Any]]) -> List[FileEntry]:  # Изменил тип аннотации для api_response
+def parse_file_list(api_response: List[Dict[str, Any]]) -> List[FileEntry]:
     """
     Parses the response from /f.php into a list of FileEntry objects.
     The API can return data in a few formats:
-    1. [{"0": [["file1.txt", 1024]]}, {"1": [["file2.mkv", 204800]]}] (original apibay style)
-    2. [["file1.txt", 1024], ["file2.mkv", 204800]] (some mirrors)
-    3. [{'name': ['filename.ext'], 'size': [12345]}] (another observed format, one file per dict entry)
+    1. [{"internal_id": [["file1.txt", 1024]]}, ...] (original apibay style)
+    2. [["file1.txt", 1024], ...] (some mirrors)
+    3. [{'name': ['filename.ext'], 'size': [12345]}, ...] (another observed format, one file per dict entry in the list)
     """
     files: List[FileEntry] = []
     if not api_response:
         return files
 
-    for item_data in api_response:
+    for item_data in api_response:  # item_data is a dict like {'name': [...], 'size': [...]}
         try:
             if isinstance(item_data, dict):
                 # Format 3: {'name': ['filename.ext'], 'size': [12345]}
                 if 'name' in item_data and 'size' in item_data and \
                         isinstance(item_data['name'], list) and len(item_data['name']) > 0 and \
                         isinstance(item_data['size'], list) and len(item_data['size']) > 0:
-                    name_val = item_data['name'][0]
-                    size_val = item_data['size'][0]
-
-                    # Иногда имя файла само может быть списком с одним элементом, а иногда просто строкой
-                    # (хотя по логу у вас ['filename'], ['size'])
-                    # Проверим на всякий случай
-                    actual_name = str(name_val[0] if isinstance(name_val, list) else name_val)
-                    actual_size = int(size_val[0] if isinstance(size_val, list) else size_val)
-
-                    files.append(FileEntry(name=actual_name, size=actual_size))
-                    continue  # Переходим к следующему элементу в api_response
+                    name_str = str(item_data['name'][0])
+                    size_int = int(item_data['size'][0])
+                    files.append(FileEntry(name=name_str, size=size_int))
+                    continue  # Processed this item_data, move to the next
 
                 # Format 1: {"internal_id": [["filename", filesize]]}
-                # The actual file info is the first value in the dict
-                # (если это не формат 3, пробуем формат 1)
+                # (If not format 3, try format 1 by checking if it has a non-'name'/'size' key structure)
+                # This logic might need refinement if formats can be ambiguous
                 file_info_list_outer = next(iter(item_data.values()), None)
                 if file_info_list_outer and isinstance(file_info_list_outer, list) and len(file_info_list_outer) > 0:
-                    # The first element of this list is another list [name, size]
                     file_details = file_info_list_outer[0]
                     if isinstance(file_details, list) and len(file_details) == 2:
                         name = str(file_details[0])
@@ -148,23 +140,22 @@ def parse_file_list(api_response: List[Dict[str, Any]]) -> List[FileEntry]:  # �
                         files.append(FileEntry(name=name, size=size))
                         continue
 
-            # Format 2: ["filename", filesize] (если item_data это список, а не словарь)
+            # Format 2: item_data is a list like ["filename", filesize]
+            # This branch is unlikely if api_response type hint is List[Dict[...]]
+            # but kept for robustness if the type hint is relaxed or API varies wildly.
             elif isinstance(item_data, list) and len(item_data) == 2:
-                # Убедимся, что первый элемент - строка (имя), а второй - можно конвертировать в int (размер)
                 if isinstance(item_data[0], str) and (isinstance(item_data[1], int) or str(item_data[1]).isdigit()):
                     name = str(item_data[0])
                     size = int(item_data[1])
                     files.append(FileEntry(name=name, size=size))
                     continue
 
-            # Если ни один известный формат не подошел для текущего item_data
             print(f"Warning: Unrecognized file entry format or malformed data. Skipping item: {item_data}")
 
         except (IndexError, ValueError, TypeError, StopIteration) as e:
-            print(f"Skipping file entry due to parsing error: {e}. Data: {item_data}")  # Or log
+            print(f"Skipping file entry due to parsing error: {e}. Data: {item_data}")
             continue
     return files
-
 
 def generate_magnet_link(info_hash: str, name: str, trackers: Optional[Sequence[str]] = None) -> str:
     """

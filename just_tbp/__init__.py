@@ -1,5 +1,5 @@
 # just_tbp/__init__.py
-__version__ = "0.2.1-alpha"
+__version__ = "0.2.1-beta"
 
 from .async_client import AsyncTPBClient # Changed
 from .models import Torrent, TorrentDetails, SearchResults, TorrentResults, FileEntry # Added FileEntry
