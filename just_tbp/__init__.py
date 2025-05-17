@@ -1,0 +1,45 @@
+# just_tbp/__init__.py
+__version__ = "0.0.1-alpha"
+
+from .client import TPBClient
+from .constants import CATEGORIES, CategoryId, Top100Category
+from .models import Torrent, TorrentDetails, SearchResults, TorrentResults
+from .exceptions import TPBRequestError, TPBContentError
+
+# For easy access to category IDs by name, e.g. from just_tbp import AUDIO_MUSIC
+from .constants import (
+    AUDIO_MUSIC, AUDIO_BOOKS, AUDIO_SOUND_CLIPS, AUDIO_FLAC, AUDIO_OTHER,
+    VIDEO_MOVIES, VIDEO_MOVIES_DVDR, VIDEO_MUSIC_VIDEOS, VIDEO_MOVIE_CLIPS,
+    VIDEO_TV_SHOWS, VIDEO_HANDHELD, VIDEO_HD_MOVIES, VIDEO_HD_TV_SHOWS,
+    VIDEO_3D, VIDEO_OTHER,
+    APPLICATION_WINDOWS, APPLICATION_MAC, APPLICATION_UNIX, APPLICATION_HANDHELD as APP_HANDHELD,  # alias
+    APPLICATION_IOS, APPLICATION_ANDROID, APPLICATION_OTHER,
+    GAMES_PC, GAMES_MAC, GAMES_PSX, GAMES_XBOX360, GAMES_WII, GAMES_HANDHELD as GAME_HANDHELD,  # alias
+    GAMES_IOS, GAMES_ANDROID, GAMES_OTHER,
+    OTHER_EBOOKS, OTHER_COMICS, OTHER_PICTURES, OTHER_COVERS,
+    OTHER_PHYSIBLES, OTHER_OTHER
+)
+
+__all__ = [
+    "TPBClient",
+    "CATEGORIES",
+    "CategoryId",
+    "Top100Category",
+    "Torrent",
+    "TorrentDetails",
+    "SearchResults",
+    "TorrentResults",
+    "TPBRequestError",
+    "TPBContentError",
+    # Export individual category constants
+    "AUDIO_MUSIC", "AUDIO_BOOKS", "AUDIO_SOUND_CLIPS", "AUDIO_FLAC", "AUDIO_OTHER",
+    "VIDEO_MOVIES", "VIDEO_MOVIES_DVDR", "VIDEO_MUSIC_VIDEOS", "VIDEO_MOVIE_CLIPS",
+    "VIDEO_TV_SHOWS", "VIDEO_HANDHELD", "VIDEO_HD_MOVIES", "VIDEO_HD_TV_SHOWS",
+    "VIDEO_3D", "VIDEO_OTHER",
+    "APPLICATION_WINDOWS", "APPLICATION_MAC", "APPLICATION_UNIX", "APP_HANDHELD",
+    "APPLICATION_IOS", "APPLICATION_ANDROID", "APPLICATION_OTHER",
+    "GAMES_PC", "GAMES_MAC", "GAMES_PSX", "GAMES_XBOX360", "GAMES_WII", "GAME_HANDHELD",
+    "GAMES_IOS", "GAMES_ANDROID", "GAMES_OTHER",
+    "OTHER_EBOOKS", "OTHER_COMICS", "OTHER_PICTURES", "OTHER_COVERS",
+    "OTHER_PHYSIBLES", "OTHER_OTHER"
+]
