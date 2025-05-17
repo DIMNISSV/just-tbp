@@ -1,5 +1,5 @@
 # just_tbp/__init__.py
-__version__ = "0.0.1-alpha"
+__version__ = "0.1.0-alpha"
 
 from .client import TPBClient
 from .constants import CATEGORIES, CategoryId, Top100Category
