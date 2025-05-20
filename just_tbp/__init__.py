@@ -1,45 +1,40 @@
 # just_tbp/__init__.py
-__version__ = "0.0.1-alpha"
+__version__ = "0.2.1-beta"
 
-from .client import TPBClient
-from .constants import CATEGORIES, CategoryId, Top100Category
-from .models import Torrent, TorrentDetails, SearchResults, TorrentResults
+from .async_client import AsyncTPBClient # Changed
+from .models import Torrent, TorrentDetails, SearchResults, TorrentResults, FileEntry # Added FileEntry
 from .exceptions import TPBRequestError, TPBContentError
+from .utils import generate_magnet_link, format_size, format_datetime # Added new utils
 
-# For easy access to category IDs by name, e.g. from just_tbp import AUDIO_MUSIC
-from .constants import (
-    AUDIO_MUSIC, AUDIO_BOOKS, AUDIO_SOUND_CLIPS, AUDIO_FLAC, AUDIO_OTHER,
-    VIDEO_MOVIES, VIDEO_MOVIES_DVDR, VIDEO_MUSIC_VIDEOS, VIDEO_MOVIE_CLIPS,
-    VIDEO_TV_SHOWS, VIDEO_HANDHELD, VIDEO_HD_MOVIES, VIDEO_HD_TV_SHOWS,
-    VIDEO_3D, VIDEO_OTHER,
-    APPLICATION_WINDOWS, APPLICATION_MAC, APPLICATION_UNIX, APPLICATION_HANDHELD as APP_HANDHELD,  # alias
-    APPLICATION_IOS, APPLICATION_ANDROID, APPLICATION_OTHER,
-    GAMES_PC, GAMES_MAC, GAMES_PSX, GAMES_XBOX360, GAMES_WII, GAMES_HANDHELD as GAME_HANDHELD,  # alias
-    GAMES_IOS, GAMES_ANDROID, GAMES_OTHER,
-    OTHER_EBOOKS, OTHER_COMICS, OTHER_PICTURES, OTHER_COVERS,
-    OTHER_PHYSIBLES, OTHER_OTHER
-)
+# Attempt to import from generated constants, fallback to a placeholder if not found
+try:
+    from .constants_generated import ( # Or constants.py if you rename it
+        CATEGORIES, CategoryId, Top100Category,
+        # Add specific category constants if you want to export all of them
+        # e.g., AUDIO_MUSIC, VIDEO_MOVIES etc.
+        # This can be automated in the generation script or manually listed
+    )
+except ImportError:
+    print("Warning: Generated constants not found. Using placeholder categories.")
+    CATEGORIES = {} # type: ignore
+    CategoryId = int # type: ignore
+    Top100Category = str # type: ignore
+
 
 __all__ = [
-    "TPBClient",
+    "AsyncTPBClient",
     "CATEGORIES",
     "CategoryId",
     "Top100Category",
     "Torrent",
     "TorrentDetails",
+    "FileEntry",
     "SearchResults",
     "TorrentResults",
     "TPBRequestError",
     "TPBContentError",
-    # Export individual category constants
-    "AUDIO_MUSIC", "AUDIO_BOOKS", "AUDIO_SOUND_CLIPS", "AUDIO_FLAC", "AUDIO_OTHER",
-    "VIDEO_MOVIES", "VIDEO_MOVIES_DVDR", "VIDEO_MUSIC_VIDEOS", "VIDEO_MOVIE_CLIPS",
-    "VIDEO_TV_SHOWS", "VIDEO_HANDHELD", "VIDEO_HD_MOVIES", "VIDEO_HD_TV_SHOWS",
-    "VIDEO_3D", "VIDEO_OTHER",
-    "APPLICATION_WINDOWS", "APPLICATION_MAC", "APPLICATION_UNIX", "APP_HANDHELD",
-    "APPLICATION_IOS", "APPLICATION_ANDROID", "APPLICATION_OTHER",
-    "GAMES_PC", "GAMES_MAC", "GAMES_PSX", "GAMES_XBOX360", "GAMES_WII", "GAME_HANDHELD",
-    "GAMES_IOS", "GAMES_ANDROID", "GAMES_OTHER",
-    "OTHER_EBOOKS", "OTHER_COMICS", "OTHER_PICTURES", "OTHER_COVERS",
-    "OTHER_PHYSIBLES", "OTHER_OTHER"
+    "generate_magnet_link",
+    "format_size",
+    "format_datetime",
+    # Potentially add all individual category constants here too
 ]

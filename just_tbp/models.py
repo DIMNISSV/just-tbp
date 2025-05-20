@@ -41,5 +41,11 @@ class TorrentDetails:
     text_language: Optional[str] = None
 
 
+@dataclass
+class FileEntry:
+    name: str
+    size: int
+
+
 SearchResults = List[Torrent]
 TorrentResults = List[Torrent]  # Alias for consistency with TS
